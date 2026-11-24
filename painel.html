@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portas de casa</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#eef1f4,#0f1418);--card:light-dark(#fff,#182027);--ink:light-dark(#14202a,#e8eef2);
+--mut:light-dark(#5b6b78,#93a3b0);--line:light-dark(#d9e0e6,#2a3640);--azul:#1f6feb;--verde:#16a34a;--ambar:#d97706;--verm:#dc2626;--roxo:#7c3aed;--cinza:#8a97a3}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px max(4vw,16px);background:var(--card);border-bottom:1px solid var(--line)}
+header h1{font-size:22px;margin:0;flex:1}
+.pill{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--line);color:var(--mut);white-space:nowrap}
+.pill.ok{background:#16a34a22;color:var(--verde)}.pill.ruim{background:#dc262622;color:var(--verm)}
+main{max-width:1100px;margin:auto;padding:16px max(4vw,16px) 48px}
+.alarme{display:none;background:var(--verm);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:16px;align-items:center;gap:12px;flex-wrap:wrap;animation:pulsa 1s infinite alternate}
+.alarme.on{display:flex}.alarme b{flex:1;font-size:18px}
+@keyframes pulsa{to{background:#991b1b}}@media(prefers-reduced-motion:reduce){.alarme{animation:none}}
+.viagem{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.viagem.on{border-color:var(--azul);box-shadow:0 0 0 2px #1f6feb33}
+.viagem h2{margin:0;font-size:18px}.viagem p{margin:2px 0 0;color:var(--mut);font-size:14px}.viagem>div{flex:1}
+.grade{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.porta{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.topo{display:flex;gap:14px;align-items:center;padding:16px;border-left:8px solid var(--cinza)}
+.topo svg{width:44px;height:44px;flex:none}
+.topo h3{margin:0;font-size:18px}.estado{font-weight:700;font-size:17px}.meta{color:var(--mut);font-size:13px}
+.verde .topo{border-color:var(--verde)}.verde .estado{color:var(--verde)}
+.ambar .topo{border-color:var(--ambar)}.ambar .estado{color:var(--ambar)}
+.verm .topo{border-color:var(--verm)}.verm .estado{color:var(--verm)}
+.roxo .topo{border-color:var(--roxo)}.roxo .estado{color:var(--roxo)}
+.cinza .estado{color:var(--cinza)}
+.porta.disparada{outline:3px solid var(--verm)}
+.linha{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.linha span{flex:1;font-size:15px}.linha small{color:var(--mut);display:block;font-size:12px}
+.opc{padding:4px 16px 14px;border-top:1px solid var(--line);display:none}.opc.on{display:block}
+.opc label{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:15px;cursor:pointer}
+.grupo{border:1px solid var(--line);border-radius:10px;padding:4px 12px 6px;margin:10px 0 0}
+.grupo legend{font-weight:700;font-size:14px;padding:0 6px}
+.opc label.trava{color:var(--mut);cursor:not-allowed}
+.opc input[type=checkbox]{width:20px;height:20px;accent-color:var(--azul)}
+.acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.pri{background:var(--azul);border-color:var(--azul);color:#fff}button.perigo{color:var(--verm)}
+button.branco{background:#fff;color:#991b1b;border:0;font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1f6feb88;outline-offset:2px}
+.sw{position:relative;width:52px;height:30px;flex:none}.sw input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer;position:absolute;z-index:1}
+.sw i{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:.2s}.sw i:after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px #0004}
+.sw input:checked+i{background:var(--azul)}.sw input:checked+i:after{left:25px}
+.add{width:100%;margin:16px 0;border-style:dashed;min-height:56px;font-size:16px}
+section.box{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:16px}
+section.box>summary,section.box>h2{font-size:17px;font-weight:700;padding:14px 16px;margin:0;cursor:pointer}
+.corpo{padding:0 16px 16px}
+input[type=text],input[type=password],input[type=number],select{font:inherit;font-size:16px;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);margin:4px 0 12px}
+.dica{font-size:13px;color:var(--mut)}
+ul.ev{list-style:none;margin:0;padding:0 16px 12px}ul.ev li{padding:6px 0;border-top:1px solid var(--line);font-size:14px;display:flex;gap:10px}
+ul.ev time{color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+.vazio{color:var(--mut);padding:20px;text-align:center;background:var(--card);border-radius:14px;border:1px dashed var(--line)}
+dialog{border:0;border-radius:16px;padding:0;width:min(520px,94vw);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:#0008}dialog .corpo{padding:16px}dialog h2{margin:0 0 8px;font-size:19px}
+.nova{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,140px);gap:8px}
+#login{max-width:460px;margin:24px auto}
+</style>
+</head>
+<body>
+<header><h1>Portas de casa</h1><span class="pill" id="pConex">Conectando...</span><span class="pill" id="pCentral"></span></header>
+<main>
+  <div id="login" hidden>
+    <section class="box"><h2>Entrar no painel remoto</h2><div class="corpo">
+      <p class="dica">Dados do seu servidor MQTT (EMQX Serverless). Ficam salvos só neste navegador.</p>
+      <label>Servidor<input type="text" id="lHost" placeholder="xxxxxx.ala.us-east-1.emqxsl.com" autocomplete="off"></label>
+      <label>Usuário<input type="text" id="lUser" autocomplete="username"></label>
+      <label>Senha<input type="password" id="lPass" autocomplete="current-password"></label>
+      <label>Prefixo (o mesmo do MQTT_PREFIXO da central)<input type="text" id="lPref" autocomplete="off"></label>
+      <button class="pri" id="lEntrar">Entrar</button> <span class="dica" id="lMsg"></span>
+    </div></section>
+  </div>
+
+  <div id="app" hidden>
+    <div class="alarme" id="banner"><b id="bannerTxt"></b><button class="branco" id="silenciar">Silenciar alarme</button></div>
+
+    <div class="viagem" id="cxViagem">
+      <div><h2>Modo viagem</h2><p>Liga o alarme de todas as portas de uma vez.</p></div>
+      <label class="sw"><input type="checkbox" id="viagem" aria-label="Modo viagem"><i></i></label>
+    </div>
+
+    <div class="grade" id="grade"></div>
+    <button class="add" id="btAdd">+ Adicionar porta</button>
+
+    <section class="box"><h2>Eventos</h2><ul class="ev" id="eventos"></ul></section>
+
+    <details class="box" id="cfgBox"><summary>Configurações do alarme e Telegram</summary><div class="corpo">
+      <label>Duração da sirene (segundos)<input type="number" id="cSeg" min="5" max="600"></label>
+      <label>Token do bot do Telegram<input type="password" id="cToken" placeholder="cole o token do @BotFather" autocomplete="off"></label>
+      <label>Seu chat ID do Telegram<input type="text" id="cChat" inputmode="numeric" autocomplete="off"></label>
+      <label>Seu @usuário do Telegram (para a ligação via CallMeBot)<input type="text" id="cCmb" placeholder="@seu_usuario" autocomplete="off"></label>
+      <div class="acoes"><button class="pri" id="cSalvar">Salvar</button><button id="cTesteMsg">Testar mensagem</button><button id="cTesteLig">Testar ligação</button></div>
+      <p class="dica">Mensagem: crie um bot no <b>@BotFather</b> (copie o token), mande "oi" para o seu bot e pegue seu chat ID no <b>@userinfobot</b>.<br>
+      Ligação: mande <b>/start</b> para o <b>@CallMeBot_txtbot</b> e autorize; depois informe seu @usuário aqui.</p>
+      <p class="dica" id="sairLinha" hidden><button id="sair">Sair do painel remoto</button></p>
+    </div></details>
+  </div>
+</main>
+
+<dialog id="dlg"><div class="corpo">
+  <h2>Adicionar porta</h2>
+  <p class="dica">Grave o firmware <b>no_porta</b> no novo ESP32-C3 e ligue-o. Ele aparece aqui sozinho em alguns segundos.</p>
+  <div id="novas"></div>
+  <div class="acoes"><button id="dlgFechar">Fechar</button></div>
+</div></dialog>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let modo='',est=null,recebidoEm=0,cli=null,base='',centralOnline=null,abertas=new Set(),assinNovas='';
+
+const ICONE_PORTA='<svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M10 40V5h24v35"/><path d="M6 40h32"/><circle cx="28" cy="23" r="2" fill="currentColor"/></svg>';
+
+function classe(p){
+  if(!p.visto) return ['cinza','Aguardando sinal'];
+  if(!p.on) return ['cinza','Sem sinal'];
+  if(p.f&&p.t) return ['verde','Fechada e trancada'];
+  if(p.f) return ['ambar','Fechada, sem tranca'];
+  if(p.t) return ['roxo','Aberta com a tranca girada'];
+  return ['verm','Aberta'];
+}
+const ACOES=[['som',1,'Disparar alarme sonoro na porta'],['tgm',2,'Enviar mensagem pelo Telegram'],['tgl',4,'Ligar pelo Telegram']];
+function resumo(m){return [m&1&&'sirene',m&2&&'mensagem',m&4&&'ligação'].filter(Boolean).join(', ')||'nada'}
+function grupo(p,ev,titulo,m){const mac=esc(p.mac);
+  return `<fieldset class="grupo"><legend>${titulo}</legend>${ACOES.map(([k,b,t])=>
+    `<label><input type="checkbox" data-op="${k}" data-ev="${ev}" data-mac="${mac}" ${m&b?'checked':''}> ${t}</label>`).join('')}
+    <label class="trava" title="Bloqueado no protótipo"><input type="checkbox" disabled> Ligar para a polícia (190) — 🔒 bloqueado no protótipo</label></fieldset>`}
+function idade(s){s=Math.round(s);if(s<60)return 'há '+s+' s';if(s<3600)return 'há '+Math.round(s/60)+' min';return 'há '+Math.round(s/3600)+' h'}
+
+function render(){
+  if(!est) return;
+  const dt=(Date.now()-recebidoEm)/1000;
+  $('viagem').checked=!!est.viagem;
+  $('cxViagem').classList.toggle('on',!!est.viagem);
+  const disp=est.portas.filter(p=>p.al);
+  $('banner').classList.toggle('on',disp.length>0);
+  $('bannerTxt').textContent=disp.length?'ALARME: '+disp.map(p=>p.n+(p.sir?' (sirene tocando)':'')).join(', '):'';
+  $('pCentral').textContent=centralOnline===false?'Central offline':(est.nuvem?'Central online · nuvem ok':'Central online');
+  $('pCentral').className='pill '+(centralOnline===false?'ruim':'ok');
+
+  $('grade').innerHTML=est.portas.length?est.portas.map(p=>{
+    const [c,txt]=classe(p);const armada=est.viagem||p.arm;
+    const meta=p.visto?`${idade(p.s+dt)} · sinal ${p.r} dBm${p.b?` · bateria ${(p.b/1000).toFixed(2)} V`:''}`:'ainda não enviou dados';
+    const ab=abertas.has(p.mac);
+    return `<article class="porta ${c}${p.al?' disparada':''}">
+      <div class="topo">${ICONE_PORTA}<div><h3>${esc(p.n)}</h3><div class="estado">${txt}</div><div class="meta">${meta}</div></div></div>
+      <div class="linha"><span>Alarme desta porta<small>${est.viagem?'ligado pelo modo viagem':(armada?'ligado':'desligado')}</small></span>
+        <label class="sw"><input type="checkbox" data-a="armar" data-mac="${esc(p.mac)}" ${p.arm?'checked':''} aria-label="Alarme de ${esc(p.n)}"><i></i></label></div>
+      <div class="linha"><span>O que o alarme faz<small>Aberta: ${resumo(p.aa)}<br>Destrancada: ${resumo(p.ad)}</small></span>
+        <button data-a="abrir" data-mac="${esc(p.mac)}" aria-expanded="${ab}">${ab?'Fechar':'Editar'}</button></div>
+      <div class="opc${ab?' on':''}">
+        ${grupo(p,'abrir','Quando a porta for ABERTA',p.aa)}
+        ${grupo(p,'destr','Quando a porta for DESTRANCADA',p.ad)}
+        <div class="acoes"><button data-a="testar" data-ev="abrir" data-mac="${esc(p.mac)}">Testar abertura</button>
+          <button data-a="testar" data-ev="destr" data-mac="${esc(p.mac)}">Testar destranca</button>
+          <button data-a="renomear" data-mac="${esc(p.mac)}" data-n="${esc(p.n)}">Renomear</button>
+          <button class="perigo" data-a="remover" data-mac="${esc(p.mac)}" data-n="${esc(p.n)}">Remover</button></div>
+      </div></article>`}).join(''):'<div class="vazio">Nenhuma porta cadastrada. Toque em "Adicionar porta".</div>';
+
+  $('eventos').innerHTML=est.eventos.length?est.eventos.map(e=>`<li><time>${e.ts?new Date(e.ts*1000).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—'}</time><span>${esc(e.m)}</span></li>`).join(''):'<li>Nenhum evento ainda.</li>';
+
+  const assin=est.novas.map(n=>n.mac).join();
+  if(assin!==assinNovas){assinNovas=assin;
+    $('novas').innerHTML=est.novas.length?est.novas.map(n=>`<div class="nova"><b>Detectado:</b> ${esc(n.n)} <span class="dica">(${esc(n.mac)})</span>
+      <input type="text" id="nn_${esc(n.mac)}" value="${esc(n.n)}" aria-label="Nome da porta">
+      <button class="pri" data-a="adicionar" data-mac="${esc(n.mac)}">Adicionar</button></div>`).join('')
+      :'<div class="vazio">Procurando dispositivos novos...</div>';}
+
+  if(!$('cfgBox').dataset.ok){$('cfgBox').dataset.ok=1;
+    $('cSeg').value=est.alarmeSeg;$('cChat').value=est.tgChat;$('cCmb').value=est.cmbUser;
+    $('cToken').placeholder=est.tgOk?'••••••• (salvo — deixe em branco para manter)':'cole o token do @BotFather';}
+}
+
+function enviar(o){
+  const corpo=new URLSearchParams(o).toString();
+  if(modo==='local'){fetch('/api/cmd',{method:'POST',body:corpo}).then(()=>setTimeout(puxar,250)).catch(()=>{})}
+  else if(cli) cli.publish(base+'/cmd',corpo,{qos:1});
+}
+
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-a]');if(!b||b.tagName==='INPUT')return;
+  const a=b.dataset.a,mac=b.dataset.mac;
+  if(a==='abrir'){abertas.has(mac)?abertas.delete(mac):abertas.add(mac);render();}
+  else if(a==='testar') enviar({a:'testar',mac,ev:b.dataset.ev});
+  else if(a==='remover'){if(confirm('Remover "'+b.dataset.n+'"?'))enviar({a:'remover',mac});}
+  else if(a==='renomear'){const n=prompt('Novo nome:',b.dataset.n);if(n)enviar({a:'renomear',mac,nome:n});}
+  else if(a==='adicionar'){enviar({a:'adicionar',mac,nome:$('nn_'+mac).value});assinNovas='';}
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.id==='viagem') enviar({a:'viagem',v:t.checked?1:0});
+  else if(t.dataset.a==='armar') enviar({a:'armar',mac:t.dataset.mac,v:t.checked?1:0});
+  else if(t.dataset.op){const mac=t.dataset.mac,ev=t.dataset.ev,
+    q=s=>document.querySelector(`[data-op="${s}"][data-ev="${ev}"][data-mac="${mac}"]`).checked?1:0;
+    enviar({a:'opcoes',mac,ev,som:q('som'),tgm:q('tgm'),tgl:q('tgl')});}
+});
+$('silenciar').onclick=()=>enviar({a:'silenciar'});
+$('btAdd').onclick=()=>{assinNovas='';render();$('dlg').showModal()};
+$('dlgFechar').onclick=()=>$('dlg').close();
+$('cSalvar').onclick=()=>{const o={a:'telegram',seg:$('cSeg').value,chat:$('cChat').value,cmb:$('cCmb').value};
+  if($('cToken').value.trim())o.token=$('cToken').value.trim();enviar(o);$('cToken').value='';$('cToken').placeholder='••••••• (salvo)';};
+$('cTesteMsg').onclick=()=>enviar({a:'teste_msg'});
+$('cTesteLig').onclick=()=>enviar({a:'teste_ligar'});
+
+// ---------- modo local (página servida pela central) ----------
+async function puxar(){
+  try{const r=await fetch('/api/estado',{cache:'no-store'});est=await r.json();recebidoEm=Date.now();centralOnline=true;
+    $('pConex').textContent='Rede local';$('pConex').className='pill ok';render();return true}
+  catch(e){centralOnline=false;$('pConex').textContent='Sem conexão';$('pConex').className='pill ruim';render();return false}
+}
+// ---------- modo nuvem (MQTT pela internet) ----------
+function lerCred(){try{return JSON.parse(localStorage.getItem('portas_mqtt')||'null')}catch(e){return null}}
+function carregarMqtt(){return new Promise((ok,erro)=>{if(window.mqtt)return ok();const s=document.createElement('script');
+  s.src='https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js';s.onload=ok;s.onerror=erro;document.head.appendChild(s)})}
+async function conectarNuvem(c){
+  $('pConex').textContent='Conectando à nuvem...';$('pConex').className='pill';
+  try{await carregarMqtt()}catch(e){$('lMsg').textContent='Sem internet para carregar o MQTT.';return}
+  base=c.pref.trim();
+  const h=c.host.trim().replace(/^\w+:\/\//,'').replace(/\/.*$/,'');
+  cli=mqtt.connect(`wss://${h.includes(':')?h:h+':8084'}/mqtt`,{username:c.user,password:c.pass,reconnectPeriod:3000,
+    clientId:'painel-'+Math.random().toString(16).slice(2,10)});
+  cli.on('connect',()=>{$('login').hidden=true;$('app').hidden=false;$('sairLinha').hidden=false;
+    $('pConex').textContent='Nuvem';$('pConex').className='pill ok';cli.subscribe([base+'/estado',base+'/online'],{qos:1})});
+  cli.on('message',(t,m)=>{const s=new TextDecoder().decode(m);
+    if(t===base+'/online'){centralOnline=s==='1';render()}
+    else if(t===base+'/estado'){try{est=JSON.parse(s);recebidoEm=Date.now();render()}catch(e){}}});
+  cli.on('error',e=>{$('lMsg').textContent='Erro: '+e.message;$('pConex').textContent='Erro na nuvem';$('pConex').className='pill ruim'});
+  cli.on('offline',()=>{$('pConex').textContent='Reconectando...';$('pConex').className='pill ruim'});
+}
+$('lEntrar').onclick=()=>{const c={host:$('lHost').value,user:$('lUser').value,pass:$('lPass').value,pref:$('lPref').value};
+  if(!c.host||!c.user||!c.pref){$('lMsg').textContent='Preencha servidor, usuário e prefixo.';return}
+  try{localStorage.setItem('portas_mqtt',JSON.stringify(c))}catch(e){}
+  $('lMsg').textContent='Conectando...';conectarNuvem(c)};
+$('sair').onclick=()=>{try{localStorage.removeItem('portas_mqtt')}catch(e){};location.reload()};
+
+(async()=>{
+  const naCentral=location.protocol==='http:'&&await (async()=>{try{const r=await fetch('/api/estado',{cache:'no-store'});return r.ok}catch(e){return false}})();
+  if(naCentral){modo='local';$('app').hidden=false;await puxar();setInterval(puxar,1000);}
+  else{modo='nuvem';const c=lerCred();
+    $('login').hidden=false;
+    if(c){$('lHost').value=c.host;$('lUser').value=c.user;$('lPass').value=c.pass;$('lPref').value=c.pref;conectarNuvem(c)}
+    else{$('pConex').textContent='Desconectado';}}
+  setInterval(render,5000);
+})();
+}
+</script>
+</body>
+</html>
